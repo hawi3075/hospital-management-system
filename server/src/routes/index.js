@@ -10,6 +10,8 @@ router.get('/health', (req, res) => {
 });
 
 router.use('/auth', require('./authRoutes'));
-router.use('/patients', require('./patientRoutes')); // <-- NEW
+router.use('/patients', require('./patientRoutes'));
+router.use('/staff', require('./staffRoutes'));
+router.use('/appointments', require('./appointmentRoutes')); // <-- NEW
 
 module.exports = router;
