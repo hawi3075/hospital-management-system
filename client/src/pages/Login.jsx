@@ -14,7 +14,7 @@ const Login = ({ onLoginSuccess }) => {
       const response = await apiClient.post('/auth/login', { email, password });
       const { token, data } = response.data;
       
-      // Store token and user role for frontend authorization checks
+      
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(data));
       
