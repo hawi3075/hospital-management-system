@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const routes = require('./routes');
 const errorHandler = require('./middleware/errorHandler');
+const seedUsers = require('./utils/seedUsers');
 
 const app = express();
 
@@ -44,6 +45,11 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`[Server] Running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+app.listen(PORT, async () => {
+  try {
+    await seedUsers();
+    console.log(`[Server] Running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  } catch (error) {
+    console.error('[Server] Demo account seeding failed:', error.message);
+  }
 });

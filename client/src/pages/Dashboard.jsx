@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import apiClient from '../utils/apiClient';
 import PatientForm from '../components/PatientForm';
+import RoleWorkspace from './RoleWorkspace';
 
 const Dashboard = () => {
   const [patients, setPatients] = useState([]);
@@ -13,7 +14,7 @@ const Dashboard = () => {
     try {
       const response = await apiClient.get('/patients');
       setPatients(response.data.data);
-    } catch (err) {
+    } catch {
       setError('Failed to load hospital records.');
     } finally {
       setLoading(false);
@@ -21,43 +22,44 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    fetchPatients();
-  }, []);
+    if (user.role === 'ADMIN') {
+      // The admin view owns the patient list; role workspaces do not need this request.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      fetchPatients();
+    }
+  }, [user.role]);
 
   const handleLogout = () => {
     localStorage.clear();
     window.location.reload();
   };
 
+  if (user.role && user.role !== 'ADMIN') {
+    return <RoleWorkspace user={user} onLogout={() => { localStorage.clear(); window.location.reload(); }} />;
+  }
+
   return (
-    <div style={{ padding: '40px', maxWidth: '1000px', margin: '0 auto', fontFamily: 'Arial, sans-serif' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', borderBottom: '1px solid #ddd', paddingBottom: '15px' }}>
-        <h2>Admin Dashboard ({user.email || 'Administrator'})</h2>
-        <button onClick={handleLogout} style={{ padding: '8px 16px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-          Sign Out
-        </button>
+    <div className="admin-shell">
+      <div className="workspace-header">
+        <div><span className="eyebrow">Administration / overview</span><h2>Hospital command center</h2></div>
+        <button className="ghost-button" onClick={handleLogout}>Sign out</button>
       </div>
 
+      <div className="welcome-strip"><div><span className="section-label">Signed in as</span><strong>{user.username || user.email || 'Administrator'}</strong></div><span className="role-badge">ADMIN</span></div>
       <PatientForm onPatientCreated={fetchPatients} />
 
-      <h3>Registered Patients</h3>
+      <h3 className="content-title">Registered patients</h3>
       {loading ? <p>Loading records...</p> : error ? <p style={{ color: 'red' }}>{error}</p> : (
-        <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '15px', background: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+        <table className="patient-table">
           <thead>
             <tr style={{ background: '#0056b3', color: 'white', textAlign: 'left' }}>
-              <th style={{ padding: '12px' }}>Patient ID</th>
-              <th style={{ padding: '12px' }}>Full Name</th>
-              <th style={{ padding: '12px' }}>Gender</th>
-              <th style={{ padding: '12px' }}>Phone</th>
+              <th>Patient ID</th><th>Full Name</th><th>Gender</th><th>Phone</th>
             </tr>
           </thead>
           <tbody>
             {patients.map((p) => (
               <tr key={p.id} style={{ borderBottom: '1px solid #eee' }}>
-                <td style={{ padding: '12px', fontWeight: 'bold' }}>{p.patientId}</td>
-                <td style={{ padding: '12px' }}>{`${p.firstName} ${p.fatherName} ${p.grandfatherName}`}</td>
-                <td style={{ padding: '12px' }}>{p.gender}</td>
-                <td style={{ padding: '12px' }}>{p.phone}</td>
+                <td><strong>{p.patientId}</strong></td><td>{`${p.firstName} ${p.fatherName} ${p.grandfatherName}`}</td><td>{p.gender}</td><td>{p.phone}</td>
               </tr>
             ))}
           </tbody>

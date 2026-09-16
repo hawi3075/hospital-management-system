@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import apiClient from '../utils/apiClient';
 
 const AppointmentForm = () => {
   const [patients, setPatients] = useState([]);
-  const [doctors, setDoctors] = useState([]);
   const [formData, setFormData] = useState({
     patientId: '',
     doctorId: '',
@@ -21,7 +20,7 @@ const AppointmentForm = () => {
         const patientsRes = await apiClient.get('/patients');
         setPatients(patientsRes.data.data);
         // Note: You can add a GET /staff/doctors route later if needed, or select dynamically
-      } catch (err) {
+      } catch {
         setError('Failed to load dropdown dependencies.');
       }
     };

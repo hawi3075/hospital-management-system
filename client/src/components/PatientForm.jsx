@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import apiClient from '../utils/apiClient';
 
 const PatientForm = ({ onPatientCreated }) => {

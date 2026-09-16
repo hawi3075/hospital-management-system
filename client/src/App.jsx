@@ -1,19 +1,8 @@
-import React, { useState } from 'react';
-import Login from './pages/Login';
-import Dashboard from './pages/Dashboard';
+import { BrowserRouter } from 'react-router-dom';
+import AppRoutes from './routes/AppRoutes';
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem('token'));
-
-  if (!token) {
-    return (
-      <div style={{ background: '#f8f9fa', minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Login onLoginSuccess={() => setToken(localStorage.getItem('token'))} />
-      </div>
-    );
-  }
-
-  return <Dashboard />;
+  return <BrowserRouter><AppRoutes /></BrowserRouter>;
 }
 
 export default App;

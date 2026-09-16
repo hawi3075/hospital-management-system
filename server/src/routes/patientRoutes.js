@@ -9,12 +9,17 @@ router.use(authMiddleware.protect);
 
 router.route('/')
   .post(
-    authMiddleware.restrictTo('ADMIN', 'RECEPTIONIST'), 
+    authMiddleware.restrictTo('ADMIN', 'HOSPITAL_ADMIN', 'RECEPTIONIST'), 
     patientController.createPatient
   )
   .get(
     authMiddleware.restrictTo('ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE'), 
     patientController.getAllPatients
   );
+
+router.get('/:id',
+  authMiddleware.restrictTo('ADMIN', 'HOSPITAL_ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE', 'PATIENT'),
+  patientController.getPatientById
+);
 
 module.exports = router;

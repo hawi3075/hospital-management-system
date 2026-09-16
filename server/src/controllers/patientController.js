@@ -44,3 +44,32 @@ exports.getAllPatients = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getPatientById = async (req, res, next) => {
+  try {
+    const patient = await prisma.patient.findUnique({
+      where: { id: req.params.id },
+      include: {
+        contacts: true,
+        appointments: { orderBy: { date: 'desc' }, take: 10 },
+        consultations: { orderBy: { createdAt: 'desc' }, take: 10 },
+      },
+    });
+
+    if (!patient) {
+      const err = new Error('Patient not found.');
+      err.statusCode = 404;
+      return next(err);
+    }
+
+    if (req.user.role.name === 'PATIENT' && patient.userId !== req.user.id) {
+      const err = new Error('You can only access your own patient record.');
+      err.statusCode = 403;
+      return next(err);
+    }
+
+    res.status(200).json({ success: true, data: patient });
+  } catch (error) {
+    next(error);
+  }
+};

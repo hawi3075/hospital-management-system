@@ -13,5 +13,6 @@ router.use('/auth', require('./authRoutes'));
 router.use('/patients', require('./patientRoutes'));
 router.use('/staff', require('./staffRoutes'));
 router.use('/appointments', require('./appointmentRoutes')); // <-- NEW
+router.use('/consultations', require('./consultationRoutes'));
 
 module.exports = router;

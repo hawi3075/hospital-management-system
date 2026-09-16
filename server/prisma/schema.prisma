@@ -26,10 +26,20 @@ enum BloodGroup {
 
 enum AppointmentStatus {
   SCHEDULED
+  CONFIRMED
   CHECKED_IN
+  WAITING
+  IN_CONSULTATION
   COMPLETED
   CANCELLED
   NO_SHOW
+}
+
+enum QueueStatus {
+  WAITING
+  CALLED
+  COMPLETED
+  SKIPPED
 }
 
 enum Priority {
@@ -61,6 +71,7 @@ enum PaymentMethod {
 
 model User {
   id           String         @id @default(uuid())
+  username     String         @unique
   email        String         @unique
   passwordHash String
   roleId       String
@@ -190,8 +201,29 @@ model Appointment {
   reason       String
   status       AppointmentStatus @default(SCHEDULED)
   consultation Consultation?
+  queueEntry   QueueEntry?
   createdAt    DateTime          @default(now())
   updatedAt    DateTime          @updatedAt
+
+  @@index([doctorId, date])
+  @@index([patientId, date])
+  @@index([status, date])
+}
+
+model QueueEntry {
+  id            String      @id @default(uuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  token         Int
+  queueDate     DateTime
+  status        QueueStatus @default(WAITING)
+  calledAt      DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([queueDate, token])
+  @@index([queueDate, status])
 }
 
 model Consultation {
