@@ -3,583 +3,493 @@ import { useNavigate } from 'react-router-dom';
 import apiClient from '../utils/apiClient';
 import { normalizeRole } from '../routes/roleConfig';
 
-// Styles are inlined so this file is drop-in on its own. Move the string
-// into Login.css and swap back to `import './Login.css'` if you'd rather
-// keep styles in a separate file.
 const styles = `
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@600;700;800&display=swap');
 
-.auth-shell {
-  --bg-1: #060b16;
-  --bg-2: #0f1e33;
-  --teal: #38e0bb;
-  --rose: #ff6f5e;
-  --amber: #ffbf6b;
-  --glass: rgba(255, 255, 255, 0.06);
-  --glass-strong: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.14);
-  --text-1: #f4f6f5;
-  --text-2: rgba(244, 246, 245, 0.68);
-  --text-3: rgba(244, 246, 245, 0.42);
+.ns-auth-root {
+  --ns-bg-dark: #030712;
+  --ns-bg-card: rgba(15, 23, 42, 0.65);
+  --ns-teal: #2dd4bf;
+  --ns-teal-glow: rgba(45, 212, 191, 0.35);
+  --ns-indigo: #6366f1;
+  --ns-rose: #f43f5e;
+  --ns-amber: #fbbf24;
+  --ns-border: rgba(255, 255, 255, 0.08);
+  --ns-border-active: rgba(45, 212, 191, 0.4);
+  --ns-text-main: #f8fafc;
+  --ns-text-muted: #94a3b8;
+  --ns-text-dim: #64748b;
 
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
-  background: radial-gradient(120% 140% at 12% 8%, var(--bg-2) 0%, var(--bg-1) 55%);
-  font-family: 'IBM Plex Sans', -apple-system, sans-serif;
-  color: var(--text-1);
-  padding: 4vw;
+  width: 100%;
+  overflow-x: hidden;
+  background-color: var(--ns-bg-dark);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--ns-text-main);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 2rem 1.5rem;
 }
 
-.auth-shell::before,
-.auth-shell::after {
-  content: '';
+/* Dynamic Glowing Orbs */
+.ns-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(90px);
-  opacity: 0.5;
+  filter: blur(120px);
   pointer-events: none;
-  animation: drift 22s ease-in-out infinite alternate;
+  z-index: 0;
 }
-
-.auth-shell::before {
-  width: 34rem;
-  height: 34rem;
-  top: -12rem;
-  right: -8rem;
-  background: radial-gradient(circle, var(--teal) 0%, transparent 70%);
+.ns-orb-1 {
+  width: 35rem;
+  height: 35rem;
+  top: -10%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.25) 0%, transparent 70%);
+  animation: floatOrb 18s ease-in-out infinite alternate;
 }
-
-.auth-shell::after {
+.ns-orb-2 {
   width: 30rem;
   height: 30rem;
-  bottom: -14rem;
-  left: -6rem;
-  background: radial-gradient(circle, var(--rose) 0%, transparent 70%);
-  animation-delay: -9s;
+  bottom: -10%;
+  right: -5%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.2) 0%, transparent 70%);
+  animation: floatOrb 22s ease-in-out infinite alternate-reverse;
 }
 
-@keyframes drift {
-  from { transform: translate(0, 0) scale(1); }
-  to { transform: translate(2.5rem, 3rem) scale(1.08); }
+@keyframes floatOrb {
+  0% { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(3rem, 4rem) scale(1.1); }
 }
 
-.auth-grid-overlay {
+/* Background Grid Overlay */
+.ns-grid-bg {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(rgba(244, 246, 245, 0.09) 1px, transparent 1px);
-  background-size: 26px 26px;
-  mask-image: radial-gradient(circle at 30% 30%, black, transparent 75%);
+  background-image: 
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(circle at 50% 50%, black 30%, transparent 80%);
   pointer-events: none;
+  z-index: 0;
 }
 
-.auth-frame {
+/* Layout Shell */
+.ns-auth-shell {
   position: relative;
-  z-index: 1;
+  z-index: 10;
   width: 100%;
-  max-width: 76rem;
+  max-width: 1200px;
   display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 3.5rem;
+  grid-template-columns: 1fr 1.05fr;
+  gap: 4rem;
   align-items: center;
 }
 
-@media (max-width: 900px) {
-  .auth-frame {
+@media (max-width: 1024px) {
+  .ns-auth-shell {
     grid-template-columns: 1fr;
-    gap: 2.5rem;
+    gap: 3rem;
   }
 }
 
-/* ---------- Left: hero ---------- */
-
-.auth-hero {
+/* Hero Section (Left Column) */
+.ns-hero {
   display: flex;
   flex-direction: column;
 }
 
-.brand-mark {
+.ns-brand {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 3rem;
+  gap: 0.85rem;
+  margin-bottom: 2.5rem;
 }
 
-.brand-glyph {
-  font-family: 'Fraunces', serif;
-  font-size: 1.3rem;
-  width: 2.6rem;
-  height: 2.6rem;
+.ns-logo-icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--ns-teal) 0%, #0d9488 100%);
+  box-shadow: 0 0 20px var(--ns-teal-glow);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  background: linear-gradient(145deg, var(--teal), #1f8f78);
-  color: #04231d;
-  font-weight: 600;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: #042f2e;
 }
 
-.brand-name {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.15;
+.ns-brand-text h3 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
 }
 
-.brand-name strong {
-  font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-size: 1.05rem;
-}
-
-.brand-name span {
+.ns-brand-text p {
+  margin: 0;
   font-size: 0.8rem;
-  color: var(--text-3);
+  color: var(--ns-text-muted);
 }
 
-.status-pill {
+.ns-live-badge {
   margin-left: auto;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  font-size: 0.78rem;
-  color: var(--text-2);
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  padding: 0.4rem 0.8rem;
-  border-radius: 999px;
+  font-size: 0.75rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 9999px;
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.25);
+  color: var(--ns-teal);
+  font-weight: 500;
 }
 
-.status-dot {
+.ns-badge-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--teal);
-  box-shadow: 0 0 0 0 rgba(56, 224, 187, 0.6);
-  animation: status-ping 2.4s ease-out infinite;
+  background: var(--ns-teal);
+  box-shadow: 0 0 10px var(--ns-teal);
+  animation: pulseDot 2s infinite;
 }
 
-@keyframes status-ping {
-  0% { box-shadow: 0 0 0 0 rgba(56, 224, 187, 0.55); }
-  70% { box-shadow: 0 0 0 8px rgba(56, 224, 187, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(56, 224, 187, 0); }
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
 }
 
-.auth-hero h1 {
-  font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-size: clamp(2.4rem, 4.2vw, 3.6rem);
-  line-height: 1.08;
-  letter-spacing: -0.015em;
-  margin: 0 0 1.1rem;
-  max-width: 20ch;
-}
-
-.hero-kicker {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  width: fit-content;
-  margin-bottom: 1rem;
-  color: var(--teal);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
+.ns-hero-tag {
+  color: var(--ns-teal);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
+  margin-bottom: 0.75rem;
 }
 
-.hero-kicker::before {
-  content: '';
-  width: 1.8rem;
-  height: 1px;
-  background: currentColor;
+.ns-hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.5rem, 5vw, 3.8rem);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  margin: 0 0 1.25rem;
+  background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.auth-hero > p {
+.ns-hero-desc {
   font-size: 1.05rem;
   line-height: 1.6;
-  color: var(--text-2);
-  max-width: 34ch;
-  margin: 0 0 2.75rem;
+  color: var(--ns-text-muted);
+  max-width: 40ch;
+  margin: 0 0 2.5rem;
 }
 
-.pulse-wrap {
-  position: relative;
-  width: 100%;
-  margin-bottom: 2.75rem;
+/* Floating Metrics Grid */
+.ns-hero-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
 }
 
-.pulse-line {
-  width: 100%;
-  height: 72px;
-  display: block;
+.ns-metric-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--ns-border);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  backdrop-filter: blur(8px);
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.pulse-line .trace {
-  fill: none;
-  stroke: var(--glass-border);
-  stroke-width: 1.5;
+.ns-metric-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
 }
 
-.pulse-line .trace-active {
-  fill: none;
-  stroke: url(#pulseGradient);
-  stroke-width: 2.25;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.pulse-dot {
-  fill: var(--teal);
-  filter: drop-shadow(0 0 6px rgba(56, 224, 187, 0.9));
-}
-
-.stat-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-}
-
-.stat-chip {
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(6px);
-  border-radius: 12px;
-  padding: 0.65rem 0.95rem;
-  font-size: 0.82rem;
-  color: var(--text-2);
+.ns-metric-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--ns-text-main);
+  margin-bottom: 0.25rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.stat-chip .dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  flex-shrink: 0;
+.ns-metric-lbl {
+  font-size: 0.8rem;
+  color: var(--ns-text-dim);
 }
 
-.stat-chip.teal .dot { background: var(--teal); }
-.stat-chip.rose .dot { background: var(--rose); }
-.stat-chip.amber .dot { background: var(--amber); }
-
-/* ---------- Right: glass card ---------- */
-
-.auth-card {
-  position: relative;
-  background: var(--glass-strong);
-  border: 1px solid var(--glass-border);
-  border-radius: 22px;
-  backdrop-filter: blur(18px);
-  box-shadow: 0 30px 80px -30px rgba(0, 0, 0, 0.6);
+/* Right Column: Glass Card */
+.ns-card {
+  background: var(--ns-bg-card);
+  border: 1px solid var(--ns-border);
+  border-radius: 28px;
   padding: 2.5rem;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  position: relative;
+  overflow: hidden;
 }
 
-.auth-card::before {
-  content: '';
+.ns-card-header-bar {
   position: absolute;
   top: 0;
-  left: 2.5rem;
-  right: 2.5rem;
-  height: 2px;
-  background: linear-gradient(90deg, var(--teal), var(--rose));
-  border-radius: 0 0 4px 4px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--ns-teal), var(--ns-indigo), var(--ns-rose));
 }
 
-.card-eyebrow {
-  color: var(--teal);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 0.6rem;
-}
-
-.auth-tabs {
+.ns-tab-group {
   display: flex;
-  gap: 0.4rem;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 0.3rem;
-  margin-bottom: 1.9rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.35rem;
+  border-radius: 14px;
+  border: 1px solid var(--ns-border);
+  margin-bottom: 2rem;
 }
 
-.auth-tabs button {
+.ns-tab-btn {
   flex: 1;
-  background: none;
+  background: transparent;
   border: none;
-  border-radius: 9px;
-  padding: 0.55rem 0;
+  color: var(--ns-text-muted);
   font-family: inherit;
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: var(--text-2);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.65rem 0;
+  border-radius: 10px;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.auth-tabs button.active {
-  background: var(--text-1);
-  color: #0b1220;
+.ns-tab-btn.active {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--ns-text-main);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.auth-heading h2 {
-  font-family: 'Fraunces', serif;
-  font-weight: 500;
-  font-size: 1.55rem;
+.ns-card-heading h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
   margin: 0 0 0.4rem;
 }
 
-.auth-heading p {
-  font-size: 0.9rem;
-  color: var(--text-2);
-  margin: 0 0 1.6rem;
+.ns-card-heading p {
+  color: var(--ns-text-muted);
+  font-size: 0.875rem;
+  margin: 0 0 1.75rem;
   line-height: 1.5;
 }
 
-.form-error {
-  background: rgba(255, 111, 94, 0.14);
-  border: 1px solid rgba(255, 111, 94, 0.4);
-  color: #ffb3a8;
-  font-size: 0.86rem;
-  padding: 0.65rem 0.85rem;
-  border-radius: 10px;
-  margin-bottom: 1.2rem;
-}
-
-.auth-form {
+/* Form Controls */
+.ns-form {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.15rem;
 }
 
-.auth-form label {
+.ns-field {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-2);
 }
 
-.field-row {
+.ns-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ns-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.ns-input, .ns-select {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1px solid var(--ns-border);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  color: var(--ns-text-main);
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.ns-input::placeholder {
+  color: var(--ns-text-dim);
+}
+
+.ns-input:focus, .ns-select:focus {
+  border-color: var(--ns-teal);
+  box-shadow: 0 0 0 3px var(--ns-teal-glow);
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.ns-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
+  gap: 0.85rem;
 }
 
-.auth-form input,
-.auth-form select {
-  font-family: inherit;
-  font-size: 0.95rem;
-  color: var(--text-1);
-  background: rgba(0, 0, 0, 0.25);
-  border: 1px solid var(--glass-border);
-  border-radius: 10px;
-  padding: 0.7rem 0.85rem;
-}
-
-.auth-form input::placeholder {
-  color: var(--text-3);
-}
-
-.auth-form input:focus,
-.auth-form select:focus {
-  outline: none;
-  border-color: var(--teal);
-  box-shadow: 0 0 0 3px rgba(56, 224, 187, 0.18);
-}
-
-.primary-action {
-  font-family: inherit;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: #04231d;
-  background: linear-gradient(120deg, var(--teal), #7fe9cf);
+/* Primary Action Button */
+.ns-btn-submit {
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, var(--ns-teal) 0%, #14b8a6 100%);
+  color: #042f2e;
   border: none;
-  border-radius: 10px;
-  padding: 0.85rem 1rem;
-  margin-top: 0.3rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.primary-action:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 10px 24px -10px rgba(56, 224, 187, 0.5);
-}
-
-.primary-action:disabled {
-  opacity: 0.6;
-  cursor: default;
-  transform: none;
-  box-shadow: none;
-}
-
-/* ---------- Demo roster ---------- */
-
-.demo-access {
-  margin-top: 2rem;
-  padding-top: 1.6rem;
-  border-top: 1px solid var(--glass-border);
-}
-
-.demo-heading {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-2);
-  margin-bottom: 1rem;
-}
-
-.demo-subheading {
-  color: var(--text-3);
-  font-size: 0.78rem;
-  line-height: 1.45;
-  margin: -0.55rem 0 1rem;
-}
-
-.signup-note {
-  display: flex;
-  gap: 0.7rem;
-  align-items: flex-start;
-  margin-top: 1.5rem;
-  padding: 0.85rem 0.9rem;
-  border: 1px solid rgba(56, 224, 187, 0.22);
   border-radius: 12px;
-  background: rgba(56, 224, 187, 0.07);
-  color: var(--text-2);
-  font-size: 0.78rem;
-  line-height: 1.45;
-}
-
-.signup-note strong {
-  display: block;
-  color: var(--text-1);
-  font-size: 0.8rem;
-  margin-bottom: 0.15rem;
-}
-
-.signup-note-mark {
-  width: 1.65rem;
-  height: 1.65rem;
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  border-radius: 8px;
-  background: var(--teal);
-  color: #04231d;
+  padding: 0.95rem;
+  font-family: inherit;
+  font-size: 0.95rem;
   font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 20px var(--ns-teal-glow);
 }
 
-.role-group {
-  margin-bottom: 1rem;
+.ns-btn-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(45, 212, 191, 0.5);
 }
 
-.role-group-label {
+.ns-btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ns-error-box {
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #fca5a5;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.85rem;
+}
+
+/* Demo Roster Grouping */
+.ns-demo-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ns-border);
+}
+
+.ns-demo-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ns-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
+}
+
+.ns-demo-sub {
+  font-size: 0.8rem;
+  color: var(--ns-text-dim);
+  margin-bottom: 1.25rem;
+}
+
+.ns-role-group {
+  margin-bottom: 1.25rem;
+}
+
+.ns-role-label {
   font-size: 0.75rem;
-  font-weight: 500;
-  margin-bottom: 0.55rem;
-  padding-left: 1rem;
-  position: relative;
-  color: var(--text-3);
+  font-weight: 600;
+  color: var(--ns-text-muted);
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
 }
 
-.role-group-label::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
+.ns-role-label-dot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: currentColor;
 }
 
-.role-group-label.tone-leadership { color: #8fb2ff; }
-.role-group-label.tone-clinical { color: var(--teal); }
-.role-group-label.tone-support { color: var(--rose); }
-.role-group-label.tone-patient { color: var(--amber); }
+.tone-leadership .ns-role-label-dot, .avatar-leadership { background: #818cf8; }
+.tone-clinical .ns-role-label-dot, .avatar-clinical { background: var(--ns-teal); }
+.tone-support .ns-role-label-dot, .avatar-support { background: var(--ns-rose); }
+.tone-patient .ns-role-label-dot, .avatar-patient { background: var(--ns-amber); }
 
-.role-chip-grid {
+.ns-chip-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
-  gap: 0.55rem;
+  grid-template-columns: repeat(auto-fill, minmax(10.5rem, 1fr));
+  gap: 0.6rem;
 }
 
-.role-chip {
+.ns-role-chip {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--ns-border);
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
   display: flex;
   align-items: center;
-  gap: 0.55rem;
-  background: rgba(0, 0, 0, 0.22);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  padding: 0.55rem 0.6rem;
+  gap: 0.65rem;
   cursor: pointer;
   text-align: left;
-  font-family: inherit;
-  transition: border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  transition: all 0.2s ease;
 }
 
-.role-chip:hover {
-  transform: translateY(-1px);
-  background: rgba(0, 0, 0, 0.32);
+.ns-role-chip:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-.role-chip.selected {
-  border-color: var(--teal);
-  background: rgba(56, 224, 187, 0.1);
+.ns-role-chip.selected {
+  border-color: var(--ns-teal);
+  background: rgba(45, 212, 191, 0.08);
 }
 
-.role-avatar {
-  width: 2rem;
-  height: 2rem;
+.ns-avatar {
+  width: 2.1rem;
+  height: 2.1rem;
   border-radius: 8px;
-  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.68rem;
-  font-weight: 600;
-  color: #04231d;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: #0f172a;
+  flex-shrink: 0;
 }
 
-.role-avatar.tone-leadership { background: #8fb2ff; }
-.role-avatar.tone-clinical { background: var(--teal); }
-.role-avatar.tone-support { background: var(--rose); color: #260a06; }
-.role-avatar.tone-patient { background: var(--amber); }
-
-.role-chip-text {
+.ns-chip-meta {
   display: flex;
   flex-direction: column;
-  line-height: 1.25;
   min-width: 0;
 }
 
-.role-chip-text strong {
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-1);
-}
-
-.role-chip-text span {
-  font-size: 0.68rem;
-  color: var(--text-3);
+.ns-chip-meta strong {
+  font-size: 0.8rem;
+  color: var(--ns-text-main);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .auth-shell::before,
-  .auth-shell::after,
-  .status-dot,
-  .pulse-motion {
-    animation: none !important;
-  }
+.ns-chip-meta span {
+  font-size: 0.7rem;
+  color: var(--ns-text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 `;
 
@@ -591,23 +501,16 @@ const roles = [
   ['RECEPTIONIST', 'Receptionist', 'reception', 'Reception@123', 'RC'],
   ['RADIOLOGY_TECHNICIAN', 'Radiology', 'radiology', 'Radiology@123', 'RT'],
   ['PHARMACIST', 'Pharmacist', 'pharmacy', 'Pharmacy@123', 'PH'],
-  ['LAB_TECHNICIAN', 'Lab Technician', 'lab', 'Lab@123', 'LT'],
+  ['LAB_TECHNICIAN', 'Lab Tech', 'lab', 'Lab@123', 'LT'],
   ['CASHIER', 'Cashier', 'finance', 'Finance@123', 'CA'],
   ['PATIENT', 'Patient', 'patient', 'Patient@123', 'PT'],
 ];
 
-
 const roleGroups = [
   { label: 'Leadership', roleValues: ['SUPER_ADMIN', 'HOSPITAL_ADMIN'], tone: 'leadership' },
-  { label: 'Clinical teams', roleValues: ['DOCTOR', 'NURSE', 'RADIOLOGY_TECHNICIAN', 'LAB_TECHNICIAN'], tone: 'clinical' },
-  { label: 'Support & front desk', roleValues: ['RECEPTIONIST', 'PHARMACIST', 'CASHIER'], tone: 'support' },
-  { label: 'Patient', roleValues: ['PATIENT'], tone: 'patient' },
-];
-
-const statChips = [
-  { text: '10 roles, one door in', tone: 'teal' },
-  { text: 'Built for 24/7 shifts', tone: 'rose' },
-  { text: 'Secure by design', tone: 'amber' },
+  { label: 'Clinical Teams', roleValues: ['DOCTOR', 'NURSE', 'RADIOLOGY_TECHNICIAN', 'LAB_TECHNICIAN'], tone: 'clinical' },
+  { label: 'Operations & Support', roleValues: ['RECEPTIONIST', 'PHARMACIST', 'CASHIER'], tone: 'support' },
+  { label: 'Patient Access', roleValues: ['PATIENT'], tone: 'patient' },
 ];
 
 const Login = ({ onLoginSuccess }) => {
@@ -666,152 +569,185 @@ const Login = ({ onLoginSuccess }) => {
   return (
     <>
       <style>{styles}</style>
-      <main className="auth-shell">
-        <div className="auth-grid-overlay" aria-hidden="true" />
+      <div className="ns-auth-root">
+        {/* Glow ambient Orbs */}
+        <div className="ns-orb ns-orb-1" aria-hidden="true" />
+        <div className="ns-orb ns-orb-2" aria-hidden="true" />
+        <div className="ns-grid-bg" aria-hidden="true" />
 
-        <div className="auth-frame">
-          <section className="auth-hero">
-            <div className="brand-mark">
-              <span className="brand-glyph" aria-hidden="true">N</span>
-              <div className="brand-name">
-                <strong>Northstar</strong>
-                <span>Hospital operations</span>
+        <div className="ns-auth-shell">
+          {/* Left Column - Hero */}
+          <section className="ns-hero">
+            <div className="ns-brand">
+              <div className="ns-logo-icon">N</div>
+              <div className="ns-brand-text">
+                <h3>Northstar</h3>
+                <p>Healthcare Intelligence</p>
               </div>
-              <span className="status-pill">
-                <span className="status-dot" aria-hidden="true" />
-                All systems normal
-              </span>
+              <div className="ns-live-badge">
+                <span className="ns-badge-dot" />
+                Operational
+              </div>
             </div>
 
-            <span className="hero-kicker">{mode === 'login' ? 'Operations command center' : 'Patient access, simplified'}</span>
-            <h1>{mode === 'login' ? 'Every shift starts here.' : 'Make care easier to reach.'}</h1>
-            <p>{mode === 'login'
-              ? 'One workspace for doctors, nurses, and every team keeping care moving, day and night.'
-              : 'Create a secure patient profile and keep your care journey in one calm, connected place.'}</p>
-
-            <div className="pulse-wrap">
-              <svg className="pulse-line" viewBox="0 0 400 72" preserveAspectRatio="none" aria-hidden="true">
-                <defs>
-                  <linearGradient id="pulseGradient" x1="0" y1="0" x2="1" y2="0">
-                    <stop offset="0%" stopColor="#38e0bb" />
-                    <stop offset="100%" stopColor="#ff6f5e" />
-                  </linearGradient>
-                </defs>
-                <path className="trace" d="M0,40 L120,40 L136,12 L154,64 L170,26 L184,40 L400,40" />
-                <path className="trace-active" d="M0,40 L120,40 L136,12 L154,64 L170,26 L184,40 L400,40" />
-                <circle className="pulse-dot pulse-motion" r="4">
-                  <animateMotion
-                    dur="3.6s"
-                    repeatCount="indefinite"
-                    path="M0,40 L120,40 L136,12 L154,64 L170,26 L184,40 L400,40"
-                  />
-                </circle>
-              </svg>
+            <div className="ns-hero-tag">
+              {mode === 'login' ? 'Command Center' : 'Patient Registration'}
             </div>
+            <h1 className="ns-hero-title">
+              {mode === 'login' ? 'Next-gen care starts here.' : 'Connecting patients to care.'}
+            </h1>
+            <p className="ns-hero-desc">
+              {mode === 'login'
+                ? 'Unified access for clinical teams, staff, and leadership driving care operations forward.'
+                : 'Set up your digital health footprint and manage care appointments seamlessly.'}
+            </p>
 
-            <div className="stat-row">
-              {statChips.map((chip) => (
-                <span className={`stat-chip ${chip.tone}`} key={chip.text}>
-                  <span className="dot" aria-hidden="true" />
-                  {chip.text}
-                </span>
-              ))}
+            <div className="ns-hero-cards">
+              <div className="ns-metric-card">
+                <div className="ns-metric-val">10 Roles</div>
+                <div className="ns-metric-lbl">Role-based access system</div>
+              </div>
+              <div className="ns-metric-card">
+                <div className="ns-metric-val">24/7</div>
+                <div className="ns-metric-lbl">Continuous uptime monitoring</div>
+              </div>
             </div>
           </section>
 
-          <section className="auth-card">
-            <div className="auth-tabs">
-              <button type="button" className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>
-                Sign in
+          {/* Right Column - Form Card */}
+          <section className="ns-card">
+            <div className="ns-card-header-bar" />
+
+            <div className="ns-tab-group">
+              <button 
+                type="button" 
+                className={`ns-tab-btn ${mode === 'login' ? 'active' : ''}`}
+                onClick={() => setMode('login')}
+              >
+                Sign In
               </button>
-              <button type="button" className={mode === 'signup' ? 'active' : ''} onClick={() => setMode('signup')}>
-                Create account
+              <button 
+                type="button" 
+                className={`ns-tab-btn ${mode === 'signup' ? 'active' : ''}`}
+                onClick={() => setMode('signup')}
+              >
+                Create Account
               </button>
             </div>
 
-            <div className="auth-heading">
-              <div className="card-eyebrow">{mode === 'login' ? 'Secure workspace access' : 'New patient profile'}</div>
-              <h2>{mode === 'login' ? 'Open your workspace' : 'Start a patient profile'}</h2>
+            <div className="ns-card-heading">
+              <h2>{mode === 'login' ? 'Welcome Back' : 'New Patient Account'}</h2>
               <p>
                 {mode === 'login'
-                  ? 'Pick a role below to try the demo, or sign in with your own credentials.'
-                  : 'Patient accounts are self-service. Staff accounts are set up by an administrator.'}
+                  ? 'Select a demo persona or log in with system credentials.'
+                  : 'Self-service registration for patient profiles.'}
               </p>
             </div>
 
-            {error && <div className="form-error">{error}</div>}
+            {error && <div className="ns-error-box">{error}</div>}
 
-            <form onSubmit={handleSubmit} className="auth-form">
-              <label>
-                Username
-                <input value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="your.username" />
-              </label>
+            <form className="ns-form" onSubmit={handleSubmit}>
+              <div className="ns-field">
+                <label className="ns-label">Username</label>
+                <input 
+                  className="ns-input" 
+                  value={username} 
+                  onChange={(e) => setUsername(e.target.value)} 
+                  required 
+                  placeholder="Enter username" 
+                />
+              </div>
+
               {mode === 'signup' && (
-                <label>
-                  Email address
-                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="you@example.com" />
-                </label>
+                <div className="ns-field">
+                  <label className="ns-label">Email Address</label>
+                  <input 
+                    type="email" 
+                    className="ns-input" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                    placeholder="you@example.com" 
+                  />
+                </div>
               )}
-              <label>
-                Password
-                <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="Enter password" />
-              </label>
+
+              <div className="ns-field">
+                <label className="ns-label">Password</label>
+                <input 
+                  type="password" 
+                  className="ns-input" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)} 
+                  required 
+                  placeholder="••••••••••••" 
+                />
+              </div>
+
               {mode === 'signup' && (
-                <label>
-                  Account type
-                  <select value={roleName} onChange={(e) => setRoleName(e.target.value)}>
+                <div className="ns-field">
+                  <label className="ns-label">Account Type</label>
+                  <select className="ns-select" value={roleName} onChange={(e) => setRoleName(e.target.value)}>
                     <option value="PATIENT">Patient</option>
                     <option value="RECEPTIONIST">Receptionist</option>
                   </select>
-                </label>
+                </div>
               )}
+
               {mode === 'signup' && roleName === 'PATIENT' && (
                 <>
-                  <label>
-                    Full name
-                    <input value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="Given name" />
-                  </label>
-                  <label>
-                    Father&apos;s name
-                    <input value={fatherName} onChange={(e) => setFatherName(e.target.value)} required placeholder="Father's name" />
-                  </label>
-                  <label>
-                    Grandfather&apos;s name
-                    <input value={grandFatherName} onChange={(e) => setGrandFatherName(e.target.value)} required placeholder="Grandfather's name" />
-                  </label>
-                  <div className="field-row">
-                    <label>
-                      Age
-                      <input type="number" min="0" value={age} onChange={(e) => setAge(e.target.value)} required placeholder="Age" />
-                    </label>
-                    <label>
-                      Gender
-                      <select value={gender} onChange={(e) => setGender(e.target.value)} required>
+                  <div className="ns-field">
+                    <label className="ns-label">Full Name</label>
+                    <input className="ns-input" value={fullName} onChange={(e) => setFullName(e.target.value)} required placeholder="First Name" />
+                  </div>
+                  <div className="ns-grid-2">
+                    <div className="ns-field">
+                      <label className="ns-label">Father's Name</label>
+                      <input className="ns-input" value={fatherName} onChange={(e) => setFatherName(e.target.value)} required placeholder="Father's Name" />
+                    </div>
+                    <div className="ns-field">
+                      <label className="ns-label">Grandfather's Name</label>
+                      <input className="ns-input" value={grandFatherName} onChange={(e) => setGrandFatherName(e.target.value)} required placeholder="Grandfather's Name" />
+                    </div>
+                  </div>
+                  <div className="ns-grid-2">
+                    <div className="ns-field">
+                      <label className="ns-label">Age</label>
+                      <input type="number" min="0" className="ns-input" value={age} onChange={(e) => setAge(e.target.value)} required placeholder="Age" />
+                    </div>
+                    <div className="ns-field">
+                      <label className="ns-label">Gender</label>
+                      <select className="ns-select" value={gender} onChange={(e) => setGender(e.target.value)} required>
                         <option value="" disabled>Select</option>
                         <option value="FEMALE">Female</option>
                         <option value="MALE">Male</option>
                       </select>
-                    </label>
+                    </div>
                   </div>
-                  <label>
-                    Address
-                    <input value={address} onChange={(e) => setAddress(e.target.value)} required placeholder="Sub-city, woreda, street" />
-                  </label>
+                  <div className="ns-field">
+                    <label className="ns-label">Address</label>
+                    <input className="ns-input" value={address} onChange={(e) => setAddress(e.target.value)} required placeholder="Sub-city, woreda, street" />
+                  </div>
                 </>
               )}
-              <button className="primary-action" type="submit" disabled={busy}>
-                {busy ? 'Please wait…' : mode === 'login' ? 'Open workspace' : 'Create account'}
+
+              <button className="ns-btn-submit" type="submit" disabled={busy}>
+                {busy ? 'Processing...' : mode === 'login' ? 'Sign In to Workspace' : 'Complete Registration'}
               </button>
             </form>
 
             {mode === 'login' && (
-              <div className="demo-access">
-                <div className="demo-heading">Demo roster</div>
-                <div className="demo-subheading">Choose a role to prefill a ready-to-use demo account.</div>
+              <div className="ns-demo-section">
+                <div className="ns-demo-title">Demo Access Roster</div>
+                <div className="ns-demo-sub">Click any role to autofill system demo accounts:</div>
+
                 {roleGroups.map((group) => (
-                  <div className="role-group" key={group.label}>
-                    <div className={`role-group-label tone-${group.tone}`}>{group.label}</div>
-                    <div className="role-chip-grid">
+                  <div className={`ns-role-group tone-${group.tone}`} key={group.label}>
+                    <div className="ns-role-label">
+                      <span className="ns-role-label-dot" />
+                      {group.label}
+                    </div>
+                    <div className="ns-chip-grid">
                       {group.roleValues.map((value) => {
                         const account = roles.find(([roleValue]) => roleValue === value);
                         if (!account) return null;
@@ -820,13 +756,13 @@ const Login = ({ onLoginSuccess }) => {
                           <button
                             key={roleValue}
                             type="button"
+                            className={`ns-role-chip ${username === accountUsername ? 'selected' : ''}`}
                             onClick={() => selectRole(roleValue)}
-                            className={`role-chip ${username === accountUsername ? 'selected' : ''}`}
                           >
-                            <span className={`role-avatar tone-${group.tone}`} aria-hidden="true">{abbr}</span>
-                            <span className="role-chip-text">
+                            <span className={`ns-avatar avatar-${group.tone}`}>{abbr}</span>
+                            <span className="ns-chip-meta">
                               <strong>{label}</strong>
-                              <span>{accountUsername} / {accountPassword}</span>
+                              <span>{accountUsername}</span>
                             </span>
                           </button>
                         );
@@ -836,16 +772,9 @@ const Login = ({ onLoginSuccess }) => {
                 ))}
               </div>
             )}
-
-            {mode === 'signup' && (
-              <div className="signup-note">
-                <span className="signup-note-mark" aria-hidden="true">+</span>
-                <span><strong>Designed for real care journeys</strong>Your profile can be completed now and connected to the hospital team when you are ready.</span>
-              </div>
-            )}
           </section>
         </div>
-      </main>
+      </div>
     </>
   );
 };
