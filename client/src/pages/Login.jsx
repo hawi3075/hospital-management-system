@@ -596,8 +596,7 @@ const roles = [
   ['PATIENT', 'Patient', 'patient', 'Patient@123', 'PT'],
 ];
 
-// Groups the demo roster by function, rather than showing ten identical
-// buttons. Each group gets its own color so it actually means something.
+
 const roleGroups = [
   { label: 'Leadership', roleValues: ['SUPER_ADMIN', 'HOSPITAL_ADMIN'], tone: 'leadership' },
   { label: 'Clinical teams', roleValues: ['DOCTOR', 'NURSE', 'RADIOLOGY_TECHNICIAN', 'LAB_TECHNICIAN'], tone: 'clinical' },
