@@ -4,7 +4,10 @@ export const roleAliases = {
   BILLING_EXECUTIVE: 'CASHIER',
 };
 
-export const normalizeRole = (role) => roleAliases[role] || role;
+export const normalizeRole = (role) => {
+  const normalizedRole = String(role || '').trim().toUpperCase();
+  return roleAliases[normalizedRole] || normalizedRole;
+};
 
 const commonItems = [
   { label: 'Dashboard', to: 'dashboard' },
