@@ -46,7 +46,7 @@ exports.createConsultation = async (req, res, next) => {
           vitalSigns: vitalSigns ? { create: { bloodPressure: vitalSigns.bloodPressure, heartRate: Number(vitalSigns.heartRate), temperature: Number(vitalSigns.temperature), spo2: Number(vitalSigns.spo2), respiratoryRate: Number(vitalSigns.respiratoryRate), weight: Number(vitalSigns.weight), height: Number(vitalSigns.height) } } : undefined,
         }, include: consultationInclude,
       });
-      await transaction.appointment.update({ where: { id: appointmentId }, data: { status: 'COMPLETED' } });
+      await transaction.appointment.update({ where: { id: appointmentId }, data: { status: 'IN_CONSULTATION' } });
       return created;
     });
     res.status(201).json({ success: true, data: consultation });

@@ -13,13 +13,15 @@ import QueuePage from '../pages/QueuePage';
 import ConsultationsPage from '../pages/ConsultationsPage';
 import ConsultationFormPage from '../pages/ConsultationFormPage';
 import ConsultationDetailPage from '../pages/ConsultationDetailPage';
+import NursingDashboard from '../pages/NursingDashboard';
+import DoctorQueuePage from '../pages/DoctorQueuePage';
 import ProtectedRoute from './ProtectedRoute';
 import { normalizeRole } from './roleConfig';
 
-const roles = ['PATIENT', 'RECEPTIONIST', 'DOCTOR', 'NURSE', 'LAB_TECHNICIAN', 'RADIOLOGY_TECHNICIAN', 'PHARMACIST', 'CASHIER', 'HOSPITAL_ADMIN', 'SUPER_ADMIN'];
+const roles = ['PATIENT', 'RECEPTIONIST', 'DOCTOR', 'NURSE', 'TRIAGE_NURSE', 'CHARGE_NURSE', 'STAFF_NURSE', 'LAB_TECHNICIAN', 'RADIOLOGY_TECHNICIAN', 'PHARMACIST', 'CASHIER', 'HOSPITAL_ADMIN', 'SUPER_ADMIN'];
 
 export default function AppRoutes() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const startPath = user.role ? `/workspace/${normalizeRole(user.role).toLowerCase()}/dashboard` : '/login';
-  return <Routes><Route path="/login" element={<Login />} /><Route path="/dashboard" element={<Navigate to={startPath} replace />} /><Route element={<ProtectedRoute allowedRoles={roles} />}><Route path="/workspace/:role" element={<AppLayout />}><Route index element={<Navigate to="dashboard" replace />} /><Route path="dashboard" element={<RoleDashboard />} /><Route path="patients" element={<PatientsPage />} /><Route path="patients/new" element={<PatientRegistrationPage />} /><Route path="patients/:patientId" element={<PatientDetailPage />} /><Route path="appointments" element={<AppointmentsPage />} /><Route path="queue" element={<QueuePage />} /><Route path="consultations" element={<ConsultationsPage />} /><Route path="consultations/new" element={<ConsultationFormPage />} /><Route path="consultations/:consultationId" element={<ConsultationDetailPage />} /><Route path="*" element={<ModulePage />} /></Route></Route><Route path="/403" element={<Forbidden />} /><Route path="/" element={<Navigate to={startPath} replace />} /><Route path="*" element={<NotFound />} /></Routes>;
+  return <Routes><Route path="/login" element={<Login />} /><Route path="/dashboard" element={<Navigate to={startPath} replace />} /><Route element={<ProtectedRoute allowedRoles={roles} />}><Route path="/workspace/:role" element={<AppLayout />}><Route index element={<Navigate to="dashboard" replace />} /><Route path="dashboard" element={<RoleDashboard />} /><Route path="doctor-queue" element={<DoctorQueuePage />} /><Route path="triage" element={<NursingDashboard initialTab="triage" />} /><Route path="rooms" element={<NursingDashboard initialTab="rooms" />} /><Route path="patients" element={<PatientsPage />} /><Route path="patients/new" element={<PatientRegistrationPage />} /><Route path="patients/:patientId" element={<PatientDetailPage />} /><Route path="appointments" element={<AppointmentsPage />} /><Route path="queue" element={<QueuePage />} /><Route path="consultations" element={<ConsultationsPage />} /><Route path="consultations/new" element={<ConsultationFormPage />} /><Route path="consultations/:consultationId" element={<ConsultationDetailPage />} /><Route path="*" element={<ModulePage />} /></Route></Route><Route path="/403" element={<Forbidden />} /><Route path="/" element={<Navigate to={startPath} replace />} /><Route path="*" element={<NotFound />} /></Routes>;
 }

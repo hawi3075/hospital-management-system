@@ -14,5 +14,7 @@ router.use('/patients', require('./patientRoutes'));
 router.use('/staff', require('./staffRoutes'));
 router.use('/appointments', require('./appointmentRoutes')); // <-- NEW
 router.use('/consultations', require('./consultationRoutes'));
+router.use('/nursing', require('./nursingRoutes'));
+router.use('/clinical-workflow', require('./clinicalWorkflowRoutes'));
 
 module.exports = router;

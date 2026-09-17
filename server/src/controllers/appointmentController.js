@@ -5,6 +5,7 @@ const appointmentIncludes = {
   doctor: { include: { employee: true } },
   department: true,
   queueEntry: true,
+  triageAssessment: true,
 };
 
 const parseAppointmentDate = (date, time) => {

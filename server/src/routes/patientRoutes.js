@@ -13,12 +13,12 @@ router.route('/')
     patientController.createPatient
   )
   .get(
-    authMiddleware.restrictTo('ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE'), 
+    authMiddleware.restrictTo('ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE', 'TRIAGE_NURSE', 'CHARGE_NURSE', 'STAFF_NURSE', 'ER_NURSE'),
     patientController.getAllPatients
   );
 
 router.get('/:id',
-  authMiddleware.restrictTo('ADMIN', 'HOSPITAL_ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE', 'PATIENT'),
+  authMiddleware.restrictTo('ADMIN', 'HOSPITAL_ADMIN', 'RECEPTIONIST', 'DOCTOR', 'NURSE', 'TRIAGE_NURSE', 'CHARGE_NURSE', 'STAFF_NURSE', 'ER_NURSE', 'PATIENT'),
   patientController.getPatientById
 );
 

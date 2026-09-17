@@ -1,0 +1,35 @@
+.nursing-page { max-width: 1280px; margin: 0 auto; }
+.nursing-heading { padding-bottom: 24px; }
+.nursing-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 24px 0; }
+.nursing-metrics article { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; align-items: center; padding: 16px 18px; background: #173f36; color: #f4faf4; }
+.nursing-metrics svg { grid-row: span 2; color: #d6a85d; }
+.nursing-metrics strong { font: 700 24px/1 'Space Grotesk'; }
+.nursing-metrics span { color: #a9c4b3; font-size: 11px; }
+.nursing-tabs { display: flex; gap: 4px; border-bottom: 1px solid #dce6de; margin-bottom: 18px; }
+.nursing-tabs button { display: inline-flex; align-items: center; gap: 8px; padding: 13px 17px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: #789087; font-weight: 700; }
+.nursing-tabs button.active { color: #16483c; border-color: #d8a75e; background: #fff; }
+.nursing-grid { display: grid; grid-template-columns: .9fr 1.1fr; gap: 18px; align-items: start; }
+.panel-intro { color: #718078; font-size: 12px; line-height: 1.6; margin: 18px 0; }
+.triage-list { display: grid; gap: 6px; }
+.triage-row { display: grid; grid-template-columns: 42px 1fr auto auto; gap: 11px; align-items: center; width: 100%; border: 1px solid #e0e9e2; background: #fff; text-align: left; padding: 10px; color: #315247; }
+.triage-row:hover, .triage-row.selected { border-color: #28745d; background: #f1f7f1; }
+.triage-row .queue-token { width: 36px; height: 36px; font-size: 15px; }
+.triage-row-main { min-width: 0; }
+.triage-row-main strong, .triage-row-main small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.triage-row-main strong { font-size: 13px; }
+.triage-row-main small, .triage-row-wait { color: #819087; font-size: 10px; }
+.triage-row-wait { white-space: nowrap; }
+.acuity-dot { width: 9px; height: 9px; border-radius: 50%; }
+.acuity-dot.critical { background: #c54a3a; }.acuity-dot.urgent { background: #d99f3c; }.acuity-dot.stable { background: #4d9a68; }
+.patient-signal { display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; margin: 20px 0; padding: 16px; background: #f3f7f3; }
+.patient-signal strong { font: 700 26px/1 'Space Grotesk'; color: #16483c; }.patient-signal span { color: #315247; font-weight: 700; }.patient-signal small { grid-column: 2; color: #819087; font-size: 11px; }
+.acuity-actions { border-top: 1px solid #e5ece6; padding-top: 17px; }.acuity-actions > div { display: flex; gap: 7px; margin-top: 10px; }
+.acuity-button { padding: 9px 12px; border: 1px solid currentColor; background: transparent; font-size: 11px; font-weight: 700; }.acuity-button.active { color: #fff; }.acuity-button.critical { color: #b54134; }.acuity-button.urgent { color: #a47120; }.acuity-button.stable { color: #3d8054; }.acuity-button.critical.active { background: #b54134; }.acuity-button.urgent.active { background: #a47120; }.acuity-button.stable.active { background: #3d8054; }
+.vitals-form { display: grid; gap: 11px; margin-top: 20px; }.vitals-form textarea { min-height: 72px; resize: vertical; border: 1px solid #cbd9ce; padding: 10px; outline: 0; }.vitals-inputs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }.vitals-inputs label, .nurse-select { display: grid; gap: 5px; color: #557064; font-size: 10px; font-weight: 700; }.vitals-inputs input, .nurse-select select { width: 100%; border: 1px solid #cbd9ce; padding: 9px 7px; color: #315247; background: #fff; }
+.primary-action { display: inline-flex; align-items: center; gap: 7px; justify-content: center; }
+.empty-workspace { display: grid; place-items: center; gap: 14px; min-height: 330px; color: #819087; text-align: center; }.empty-workspace svg { color: #b4cbb9; }.empty-workspace p { max-width: 280px; font-size: 13px; line-height: 1.6; }
+.room-layout { display: grid; grid-template-columns: 1fr 280px; gap: 18px; align-items: start; }.room-legend { display: flex; flex-wrap: wrap; gap: 12px; margin: 19px 0; color: #718078; font-size: 10px; }.legend::before { content: ''; display: inline-block; width: 8px; height: 8px; margin-right: 5px; border-radius: 50%; background: #4d9a68; }.legend.occupied::before { background: #c54a3a; }.legend.cleaning::before { background: #d99f3c; }.legend.isolation::before { background: #4c86b7; }
+.room-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }.room-card { min-height: 190px; border: 2px solid #b9d9c0; background: #f3faf3; padding: 15px; }.room-card.occupied { border-color: #e5b3aa; background: #fff7f5; }.room-card.cleaning { border-color: #e6cf9c; background: #fffaf0; }.room-card.maintenance, .room-card.isolation { border-color: #aac7df; background: #f3f8fc; }.room-card-head { display: flex; justify-content: space-between; gap: 8px; }.room-card h3 { margin-top: 5px; font-size: 20px; }.room-state { color: #718078; font-size: 9px; text-transform: uppercase; letter-spacing: .1em; }.bed-list { display: grid; gap: 7px; margin-top: 14px; }.bed-slot { display: grid; grid-template-columns: auto 1fr; gap: 2px 7px; align-items: center; padding: 9px; background: rgba(255,255,255,.7); border: 1px solid rgba(84,120,96,.18); color: #557064; font-size: 11px; }.bed-slot svg { grid-row: span 2; color: #7fa38b; }.bed-slot strong { color: #315247; font-size: 11px; }.bed-slot strong small { display: block; color: #819087; font-size: 9px; font-weight: 400; margin-top: 3px; }.bed-slot em { grid-column: 2; color: #819087; font-size: 10px; font-style: normal; }.los-label { display: block; margin-top: 10px; color: #9b3728; font-size: 10px; }.room-side-panel { display: grid; gap: 14px; }.room-side-panel p { color: #718078; font-size: 12px; line-height: 1.6; }.permission-note, .room-drop-note { display: flex; gap: 9px; align-items: flex-start; padding: 13px; background: #f3f7f3; color: #718078; font-size: 11px; line-height: 1.5; }.permission-note svg, .room-drop-note svg { color: #28745d; flex: 0 0 auto; }
+.compact-state { padding: 28px 12px; }.state-panel.compact-state p { margin: 0; }
+@media (max-width: 900px) { .nursing-grid, .room-layout { grid-template-columns: 1fr; } }
+@media (max-width: 620px) { .nursing-metrics { grid-template-columns: 1fr; }.room-grid { grid-template-columns: 1fr; }.vitals-inputs { grid-template-columns: repeat(2, 1fr); }.patient-signal { grid-template-columns: 1fr; }.patient-signal small { grid-column: auto; }.nursing-tabs button { flex: 1; justify-content: center; padding-inline: 8px; font-size: 11px; } }

@@ -6,6 +6,9 @@ const demoUsers = [
   ['admin', 'admin@carepulse.com', 'Admin@123', 'HOSPITAL_ADMIN'],
   ['doctor', 'doctor@hospital.local', 'Doctor@123', 'DOCTOR'],
   ['nurse', 'nurse@hospital.local', 'Nurse@123', 'NURSE'],
+  ['triage', 'triage@hospital.local', 'Triage@123', 'TRIAGE_NURSE'],
+  ['charge', 'charge@hospital.local', 'Charge@123', 'CHARGE_NURSE'],
+  ['staffnurse', 'staffnurse@hospital.local', 'StaffNurse@123', 'STAFF_NURSE'],
   ['reception', 'reception@carepulse.com', 'Reception@123', 'RECEPTIONIST'],
   ['lab', 'lab@carepulse.com', 'Lab@123', 'LAB_TECHNICIAN'],
   ['radiology', 'radiology@carepulse.com', 'Radiology@123', 'RADIOLOGY_TECHNICIAN'],
@@ -13,6 +16,14 @@ const demoUsers = [
   ['finance', 'finance@carepulse.com', 'Finance@123', 'CASHIER'],
   ['patient', 'patient@carepulse.com', 'Patient@123', 'PATIENT'],
 ];
+
+const rolePermissions = {
+  TRIAGE_NURSE: ['triage.read', 'triage.check-in', 'triage.assess', 'triage.assign-acuity'],
+  CHARGE_NURSE: ['triage.read-write', 'rooms.read-write', 'rooms.assign-bed', 'rooms.override', 'teams.assign-nurse'],
+  STAFF_NURSE: ['triage.read', 'assigned-rooms.read-write', 'vitals.write', 'nursing-notes.write'],
+  HOSPITAL_ADMIN: ['settings.rooms.configure', 'settings.rooms.status', 'settings.shifts.update'],
+  SUPER_ADMIN: ['settings.rooms.configure', 'settings.rooms.status', 'settings.shifts.update'],
+};
 
 async function seedUsers() {
   for (const [username, email, password, roleName] of demoUsers) {
@@ -28,6 +39,11 @@ async function seedUsers() {
       update: { email, passwordHash, roleId: role.id, isActive: true },
       create: { username, email, passwordHash, roleId: role.id },
     });
+
+    for (const permissionName of rolePermissions[roleName] || []) {
+      const permission = await prisma.permission.upsert({ where: { name: permissionName }, update: {}, create: { name: permissionName } });
+      await prisma.rolePermission.upsert({ where: { roleId_permissionId: { roleId: role.id, permissionId: permission.id } }, update: {}, create: { roleId: role.id, permissionId: permission.id } });
+    }
   }
 }
 

@@ -2,6 +2,7 @@ export const roleAliases = {
   ADMIN: 'HOSPITAL_ADMIN',
   HOSPITAL_MANAGER: 'HOSPITAL_ADMIN',
   BILLING_EXECUTIVE: 'CASHIER',
+  ER_NURSE: 'STAFF_NURSE',
 };
 
 export const normalizeRole = (role) => {
@@ -41,6 +42,7 @@ export const roleNavigation = {
   ],
   DOCTOR: [
     commonItems[0],
+    { label: 'Triage handoffs', to: 'doctor-queue' },
     { label: 'My Profile', to: 'profile' },
     { label: 'Schedule', to: 'schedule' },
     { label: 'Appointments', to: 'appointments' },
@@ -63,6 +65,9 @@ export const roleNavigation = {
     { label: 'Admissions', to: 'admissions' },
     commonItems[1],
   ],
+  TRIAGE_NURSE: [commonItems[0], { label: 'Triage Room', to: 'triage' }, { label: 'Room Arrangement', to: 'rooms' }, { label: 'Triage Queue', to: 'queue' }, commonItems[2], commonItems[1]],
+  CHARGE_NURSE: [commonItems[0], { label: 'Triage Room', to: 'triage' }, { label: 'Room Arrangement', to: 'rooms' }, { label: 'Care Teams', to: 'staff' }, commonItems[2], commonItems[1]],
+  STAFF_NURSE: [commonItems[0], { label: 'Triage Queue', to: 'triage' }, { label: 'Assigned Rooms', to: 'rooms' }, { label: 'Vitals', to: 'vitals' }, commonItems[2], commonItems[1]],
   LAB_TECHNICIAN: [
     commonItems[0],
     { label: 'Doctor Requests', to: 'orders' },
@@ -137,10 +142,21 @@ export const roleTitles = {
   RECEPTIONIST: 'Front desk',
   DOCTOR: 'Clinical workspace',
   NURSE: 'Nursing station',
+  TRIAGE_NURSE: 'Triage nursing station',
+  CHARGE_NURSE: 'Charge nurse station',
+  STAFF_NURSE: 'Staff nurse station',
   LAB_TECHNICIAN: 'Laboratory',
   RADIOLOGY_TECHNICIAN: 'Radiology',
   PHARMACIST: 'Pharmacy',
   CASHIER: 'Finance desk',
   HOSPITAL_ADMIN: 'Hospital administration',
   SUPER_ADMIN: 'Platform administration',
+};
+
+export const nursingPermissionMatrix = {
+  TRIAGE_NURSE: ['triage.read', 'triage.check-in', 'triage.assess', 'triage.assign-acuity'],
+  CHARGE_NURSE: ['triage.read-write', 'rooms.read-write', 'rooms.assign-bed', 'rooms.override', 'teams.assign-nurse'],
+  STAFF_NURSE: ['triage.read', 'assigned-rooms.read-write', 'vitals.write', 'nursing-notes.write'],
+  HOSPITAL_ADMIN: ['settings.rooms.configure', 'settings.rooms.status', 'settings.shifts.update'],
+  SUPER_ADMIN: ['settings.rooms.configure', 'settings.rooms.status', 'settings.shifts.update'],
 };

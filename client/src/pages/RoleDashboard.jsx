@@ -3,6 +3,7 @@ import { ArrowUpRight, CalendarDays, ClipboardList, Users } from 'lucide-react';
 import { Link, useParams } from 'react-router-dom';
 import apiClient from '../utils/apiClient';
 import { normalizeRole, roleTitles } from '../routes/roleConfig';
+import NursingDashboard from './NursingDashboard';
 
 const dashboardCopy = {
   PATIENT: { eyebrow: 'Your care journey', title: 'A clearer view of your care.', subtitle: 'Appointments, records, results, and bills in one place.', links: [['appointments', 'Review appointments'], ['medical-record', 'Open medical record'], ['bills', 'Review bills']] },
@@ -20,6 +21,11 @@ const dashboardCopy = {
 export default function RoleDashboard() {
   const { role } = useParams();
   const currentRole = normalizeRole(role?.toUpperCase());
+  if (['NURSE', 'TRIAGE_NURSE', 'CHARGE_NURSE', 'STAFF_NURSE'].includes(currentRole)) return <NursingDashboard />;
+  return <StandardRoleDashboard currentRole={currentRole} />;
+}
+
+function StandardRoleDashboard({ currentRole }) {
   const copy = dashboardCopy[currentRole] || dashboardCopy.HOSPITAL_ADMIN;
   const [patientCount, setPatientCount] = useState(null);
   const [error, setError] = useState('');

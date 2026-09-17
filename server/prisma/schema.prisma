@@ -55,6 +55,12 @@ enum BedStatus {
   MAINTENANCE
 }
 
+enum RoomStatus {
+  ACTIVE
+  MAINTENANCE
+  ISOLATION
+}
+
 enum InvoiceStatus {
   UNPAID
   PARTIAL
@@ -81,6 +87,8 @@ model User {
   patient      Patient?
   notifications Notification[]
   auditLogs    AuditLog[]
+  triageAssessments TriageAssessment[] @relation("TriageRecorder")
+  assignedAdmissions Admission[] @relation("AssignedNurse")
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 }
@@ -200,6 +208,7 @@ model Appointment {
   time         String
   reason       String
   status       AppointmentStatus @default(SCHEDULED)
+  triageAssessment TriageAssessment?
   consultation Consultation?
   queueEntry   QueueEntry?
   createdAt    DateTime          @default(now())
@@ -208,6 +217,23 @@ model Appointment {
   @@index([doctorId, date])
   @@index([patientId, date])
   @@index([status, date])
+}
+
+model TriageAssessment {
+  id              String      @id @default(uuid())
+  appointmentId   String      @unique
+  appointment     Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  priority        Priority
+  assessmentNotes String?
+  bloodPressure   String?
+  heartRate       Int?
+  temperature     Float?
+  spo2            Int?
+  respiratoryRate Int?
+  recordedById    String
+  recordedBy      User        @relation("TriageRecorder", fields: [recordedById], references: [id])
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
 }
 
 model QueueEntry {
@@ -390,11 +416,14 @@ model Ward {
 }
 
 model Room {
-  id     String @id @default(uuid())
-  wardId String
-  ward   Ward   @relation(fields: [wardId], references: [id], onDelete: Cascade)
-  number String
-  beds   Bed[]
+  id          String     @id @default(uuid())
+  wardId      String
+  ward        Ward       @relation(fields: [wardId], references: [id], onDelete: Cascade)
+  number      String
+  section     String     @default("Main ER")
+  status      RoomStatus @default(ACTIVE)
+  displayOrder Int       @default(0)
+  beds        Bed[]
 }
 
 model Bed {
@@ -415,6 +444,8 @@ model Admission {
   admittedAt   DateTime  @default(now())
   dischargedAt DateTime?
   diagnosis    String
+  assignedNurseId String?
+  assignedNurse User? @relation("AssignedNurse", fields: [assignedNurseId], references: [id])
   status       String    @default("ADMITTED") 
 }
 
