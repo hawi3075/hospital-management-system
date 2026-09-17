@@ -3,6 +3,10 @@ import apiClient from '../utils/apiClient';
 
 const AppointmentForm = () => {
   const [patients, setPatients] = useState([]);
+  const [doctors, setDoctors] = useState([]);
+  const [departments, setDepartments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const [formData, setFormData] = useState({
     patientId: '',
     doctorId: '',
@@ -17,11 +21,21 @@ const AppointmentForm = () => {
   useEffect(() => {
     const fetchDropdownData = async () => {
       try {
-        const patientsRes = await apiClient.get('/patients');
-        setPatients(patientsRes.data.data);
-        // Note: You can add a GET /staff/doctors route later if needed, or select dynamically
-      } catch {
+        setLoading(true);
+        // Fetch patients, doctors, and departments concurrently
+        const [patientsRes, doctorsRes, departmentsRes] = await Promise.all([
+          apiClient.get('/patients'),
+          apiClient.get('/staff/doctors'), // Ensure this endpoint matches your backend route
+          apiClient.get('/departments')    // Ensure this endpoint matches your backend route
+        ]);
+
+        setPatients(patientsRes.data.data || []);
+        setDoctors(doctorsRes.data.data || []);
+        setDepartments(departmentsRes.data.data || []);
+      } catch (err) {
         setError('Failed to load dropdown dependencies.');
+      } finally {
+        setLoading(false);
       }
     };
     fetchDropdownData();
@@ -57,7 +71,9 @@ const AppointmentForm = () => {
       <h4>Schedule Clinical Appointment</h4>
       {message && <div style={{ color: 'green', marginBottom: '10px' }}>{message}</div>}
       {error && <div style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+      
       <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+        {/* Patient Selection */}
         <div>
           <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Select Patient</label>
           <select name="patientId" value={formData.patientId} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}>
@@ -67,29 +83,51 @@ const AppointmentForm = () => {
             ))}
           </select>
         </div>
+
+        {/* Doctor Selection */}
         <div>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Doctor ID</label>
-          <input type="text" name="doctorId" placeholder="Paste Doctor UUID" value={formData.doctorId} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Select Doctor</label>
+          <select name="doctorId" value={formData.doctorId} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}>
+            <option value="">-- Choose Doctor --</option>
+            {doctors.map(d => (
+              <option key={d.id} value={d.id}>Dr. {d.firstName} {d.lastName}</option>
+            ))}
+          </select>
         </div>
+
+        {/* Department Selection */}
         <div>
-          <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Department ID</label>
-          <input type="text" name="departmentId" placeholder="Paste Department UUID" value={formData.departmentId} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Select Department</label>
+          <select name="departmentId" value={formData.departmentId} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }}>
+            <option value="">-- Choose Department --</option>
+            {departments.map(dept => (
+              <option key={dept.id} value={dept.id}>{dept.name}</option>
+            ))}
+          </select>
         </div>
+
+        {/* Appointment Date */}
         <div>
           <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Appointment Date</label>
           <input type="date" name="date" value={formData.date} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
         </div>
+
+        {/* Time Slot */}
         <div>
           <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Time Slot</label>
           <input type="text" name="time" value={formData.time} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
         </div>
+
+        {/* Reason for Visit */}
         <div style={{ gridColumn: 'span 2' }}>
           <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Reason for Visit</label>
           <input type="text" name="reason" value={formData.reason} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} placeholder="e.g. Regular Checkup" />
         </div>
+
+        {/* Submit Button */}
         <div style={{ gridColumn: 'span 2' }}>
-          <button type="submit" style={{ padding: '10px 20px', background: '#0056b3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
-            Confirm Appointment
+          <button type="submit" disabled={loading} style={{ padding: '10px 20px', background: '#0056b3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
+            {loading ? 'Loading...' : 'Confirm Appointment'}
           </button>
         </div>
       </form>
