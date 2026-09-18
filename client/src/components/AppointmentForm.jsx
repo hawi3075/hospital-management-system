@@ -124,7 +124,7 @@ const AppointmentForm = () => {
           <input type="text" name="reason" value={formData.reason} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} placeholder="e.g. Regular Checkup" />
         </div>
 
-        {/* Submit Button */}
+        
         <div style={{ gridColumn: 'span 2' }}>
           <button type="submit" disabled={loading} style={{ padding: '10px 20px', background: '#0056b3', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>
             {loading ? 'Loading...' : 'Confirm Appointment'}
