@@ -1,22 +1,21 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import apiClient from '../utils/apiClient';
 import { normalizeRole } from '../routes/roleConfig';
 
 const styles = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
 .ns-auth-root {
-  --ns-bg: #f8fafc;
-  --ns-card-bg: #ffffff;
-  --ns-accent: #2563eb;
-  --ns-accent-hover: #1d4ed8;
-  --ns-accent-soft: #eff6ff;
-  --ns-border: #e2e8f0;
-  --ns-border-active: #2563eb;
-  --ns-text-main: #0f172a;
-  --ns-text-muted: #64748b;
-  --ns-text-dim: #94a3b8;
+  --ns-bg: #edf1ee;
+  --ns-card-bg: #fffdf8;
+  --ns-accent: #16483c;
+  --ns-accent-hover: #286451;
+  --ns-accent-soft: #eff7ef;
+  --ns-border: #dce5df;
+  --ns-border-active: #28745d;
+  --ns-text-main: #17211f;
+  --ns-text-muted: #718078;
+  --ns-text-dim: #89958e;
   --ns-danger: #dc2626;
   --ns-danger-bg: #fef2f2;
   --ns-danger-border: #fecaca;
@@ -25,22 +24,25 @@ const styles = `
   min-height: 100vh;
   width: 100%;
   background-color: var(--ns-bg);
-  font-family: 'Inter', sans-serif;
+  background-image: linear-gradient(135deg, rgba(27,88,74,.08) 0 1px, transparent 1px), linear-gradient(45deg, rgba(27,88,74,.05) 0 1px, transparent 1px);
+  background-size: 48px 48px;
+  font-family: 'DM Sans', sans-serif;
   color: var(--ns-text-main);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
-  padding: 4rem 1.5rem 2rem;
+  padding: 2.5rem 1.5rem;
 }
 
 /* Layout Shell */
 .ns-auth-shell {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1160px;
   display: grid;
-  grid-template-columns: 1fr 1.05fr;
-  gap: 3rem;
-  align-items: start;
+  grid-template-columns: .88fr 1.12fr;
+  gap: 0;
+  align-items: stretch;
+  box-shadow: 0 24px 70px rgba(28,53,45,.14);
 }
 
 @media (max-width: 1024px) {
@@ -54,30 +56,48 @@ const styles = `
 .ns-hero {
   display: flex;
   flex-direction: column;
+  padding: 3.5rem 3.25rem;
+  color: #eff7ef;
+  background: var(--ns-accent);
+  position: relative;
+  overflow: hidden;
+}
+
+.ns-hero::after {
+  content: '';
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 50%;
+  right: -150px;
+  bottom: -90px;
+  box-shadow: 0 0 0 24px rgba(255,255,255,.04), 0 0 0 48px rgba(255,255,255,.03);
 }
 
 .ns-brand {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 2.5rem;
+  margin-bottom: 1rem;
 }
 
 .ns-logo-icon {
   width: 2.75rem;
   height: 2.75rem;
   border-radius: 10px;
-  background: var(--ns-accent);
+  background: #d8a75e;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 800;
   font-size: 1.3rem;
-  color: #ffffff;
+  color: #17352d;
 }
 
 .ns-brand-text h3 {
   font-size: 1.15rem;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   margin: 0;
 }
@@ -85,7 +105,7 @@ const styles = `
 .ns-brand-text p {
   margin: 0;
   font-size: 0.8rem;
-  color: var(--ns-text-muted);
+  color: #b3d4ae;
 }
 
 .ns-live-badge {
@@ -96,9 +116,9 @@ const styles = `
   font-size: 0.75rem;
   padding: 0.3rem 0.7rem;
   border-radius: 9999px;
-  background: var(--ns-accent-soft);
+  background: rgba(255,255,255,.09);
   border: 1px solid #bfdbfe;
-  color: var(--ns-accent);
+  color: #d8e9d5;
   font-weight: 500;
 }
 
@@ -106,11 +126,11 @@ const styles = `
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--ns-accent);
+  background: #d8a75e;
 }
 
 .ns-hero-tag {
-  color: var(--ns-accent);
+  color: #b3d4ae;
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -124,7 +144,8 @@ const styles = `
   line-height: 1.15;
   letter-spacing: -0.02em;
   margin: 0 0 1rem;
-  color: var(--ns-text-main);
+  color: #eff7ef;
+  font-family: 'Space Grotesk', sans-serif;
 }
 
 .ns-hero-desc {
@@ -132,7 +153,7 @@ const styles = `
   line-height: 1.6;
   color: var(--ns-text-muted);
   max-width: 40ch;
-  margin: 0 0 2.25rem;
+  margin: 0 0 2.5rem;
 }
 
 /* Metrics Grid */
@@ -143,8 +164,8 @@ const styles = `
 }
 
 .ns-metric-card {
-  background: var(--ns-card-bg);
-  border: 1px solid var(--ns-border);
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.14);
   border-radius: 12px;
   padding: 1rem 1.15rem;
 }
@@ -152,30 +173,30 @@ const styles = `
 .ns-metric-val {
   font-size: 1.1rem;
   font-weight: 700;
-  color: var(--ns-text-main);
+  color: #fff;
   margin-bottom: 0.2rem;
 }
 
 .ns-metric-lbl {
   font-size: 0.8rem;
-  color: var(--ns-text-dim);
+  color: #b3d4ae;
 }
 
 /* Right Column: Card */
 .ns-card {
   background: var(--ns-card-bg);
   border: 1px solid var(--ns-border);
-  border-radius: 16px;
-  padding: 2.25rem;
+  border-radius: 0;
+  padding: 3rem 3.25rem;
 }
 
 .ns-tab-group {
   display: flex;
-  background: var(--ns-bg);
+  background: transparent;
   padding: 0.3rem;
   border-radius: 10px;
   border: 1px solid var(--ns-border);
-  margin-bottom: 1.75rem;
+  margin-bottom: 2.25rem;
 }
 
 .ns-tab-btn {
@@ -195,11 +216,13 @@ const styles = `
 .ns-tab-btn.active {
   background: var(--ns-card-bg);
   color: var(--ns-text-main);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  color: var(--ns-accent);
+  box-shadow: none;
 }
 
 .ns-card-heading h2 {
   font-size: 1.4rem;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
   margin: 0 0 0.35rem;
 }
@@ -234,7 +257,7 @@ const styles = `
   width: 100%;
   background: var(--ns-card-bg);
   border: 1px solid var(--ns-border);
-  border-radius: 8px;
+  border-radius: 0;
   padding: 0.7rem 0.9rem;
   color: var(--ns-text-main);
   font-family: inherit;
@@ -262,10 +285,10 @@ const styles = `
 /* Primary Action Button */
 .ns-btn-submit {
   margin-top: 0.4rem;
-  background: var(--ns-accent);
-  color: #ffffff;
+  background: #d8a75e;
+  color: #252016;
   border: none;
-  border-radius: 8px;
+  border-radius: 0;
   padding: 0.85rem;
   font-family: inherit;
   font-size: 0.95rem;
@@ -275,7 +298,8 @@ const styles = `
 }
 
 .ns-btn-submit:hover:not(:disabled) {
-  background: var(--ns-accent-hover);
+  background: #e0b66f;
+  transform: translateY(-1px);
 }
 
 .ns-btn-submit:disabled {
@@ -291,6 +315,12 @@ const styles = `
   border-radius: 8px;
   font-size: 0.85rem;
 }
+
+.ns-password-wrap { position: relative; }
+.ns-password-wrap .ns-input { padding-right: 3rem; }
+.ns-password-toggle { position: absolute; right: .75rem; top: 50%; transform: translateY(-50%); display: grid; place-items: center; border: 0; background: transparent; color: var(--ns-text-dim); padding: .25rem; }
+.ns-security-note { display: flex; align-items: center; gap: .5rem; margin-top: 1rem; color: var(--ns-text-dim); font-size: .75rem; }
+.ns-security-note svg { color: #28745d; flex-shrink: 0; }
 
 /* Demo Roster Grouping */
 .ns-demo-section {
@@ -396,6 +426,23 @@ const styles = `
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+.ns-btn-submit { display: flex; align-items: center; justify-content: center; gap: .5rem; }
+
+@media (max-width: 700px) {
+  .ns-auth-root { align-items: flex-start; padding: 1rem; }
+  .ns-auth-shell { grid-template-columns: 1fr; }
+  .ns-hero { padding: 2rem 1.5rem; }
+  .ns-hero-title { font-size: 2rem; }
+  .ns-hero-cards { grid-template-columns: 1fr 1fr; }
+  .ns-card { padding: 2rem 1.5rem; }
+}
+
+@media (max-width: 420px) {
+  .ns-live-badge { display: none; }
+  .ns-grid-2 { grid-template-columns: 1fr; }
+  .ns-hero-cards { grid-template-columns: 1fr; }
+}
 `;
 
 const roles = [
@@ -427,6 +474,7 @@ const Login = ({ onLoginSuccess }) => {
   const [username, setUsername] = useState('admin');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [roleName, setRoleName] = useState('PATIENT');
   const [fullName, setFullName] = useState('');
   const [fatherName, setFatherName] = useState('');
@@ -482,14 +530,14 @@ const Login = ({ onLoginSuccess }) => {
           {/* Left Column - Hero */}
           <section className="ns-hero">
             <div className="ns-brand">
-              <div className="ns-logo-icon">N</div>
+              <div className="ns-logo-icon">CP</div>
               <div className="ns-brand-text">
-                <h3>Northstar</h3>
-                <p>Healthcare Intelligence</p>
+                <h3>CarePulse</h3>
+                <p>Hospital management system</p>
               </div>
               <div className="ns-live-badge">
                 <span className="ns-badge-dot" />
-                Operational
+                Systems online
               </div>
             </div>
 
@@ -507,12 +555,12 @@ const Login = ({ onLoginSuccess }) => {
 
             <div className="ns-hero-cards">
               <div className="ns-metric-card">
-                <div className="ns-metric-val">10 Roles</div>
-                <div className="ns-metric-lbl">Role-based access system</div>
+                <div className="ns-metric-val">One workspace</div>
+                <div className="ns-metric-lbl">For every care team</div>
               </div>
               <div className="ns-metric-card">
-                <div className="ns-metric-val">24/7</div>
-                <div className="ns-metric-lbl">Continuous uptime monitoring</div>
+                <div className="ns-metric-val">Secure access</div>
+                <div className="ns-metric-lbl">Built around your role</div>
               </div>
             </div>
           </section>
@@ -549,8 +597,10 @@ const Login = ({ onLoginSuccess }) => {
 
             <form className="ns-form" onSubmit={handleSubmit}>
               <div className="ns-field">
-                <label className="ns-label">Username</label>
+                <label className="ns-label" htmlFor="auth-username">Username</label>
                 <input
+                  id="auth-username"
+                  autoComplete="username"
                   className="ns-input"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -561,8 +611,10 @@ const Login = ({ onLoginSuccess }) => {
 
               {mode === 'signup' && (
                 <div className="ns-field">
-                  <label className="ns-label">Email Address</label>
+                  <label className="ns-label" htmlFor="auth-email">Email Address</label>
                   <input
+                    id="auth-email"
+                    autoComplete="email"
                     type="email"
                     className="ns-input"
                     value={email}
@@ -574,15 +626,22 @@ const Login = ({ onLoginSuccess }) => {
               )}
 
               <div className="ns-field">
-                <label className="ns-label">Password</label>
-                <input
-                  type="password"
-                  className="ns-input"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="••••••••••••"
-                />
+                <label className="ns-label" htmlFor="auth-password">Password</label>
+                <div className="ns-password-wrap">
+                  <input
+                    id="auth-password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                    className="ns-input"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="Enter your password"
+                  />
+                  <button className="ns-password-toggle" type="button" aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword((visible) => !visible)}>
+                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </div>
               </div>
 
               {mode === 'signup' && (
@@ -633,9 +692,12 @@ const Login = ({ onLoginSuccess }) => {
               )}
 
               <button className="ns-btn-submit" type="submit" disabled={busy}>
-                {busy ? 'Processing...' : mode === 'login' ? 'Sign In to Workspace' : 'Complete Registration'}
+                {busy ? 'Processing...' : mode === 'login' ? 'Sign In to Workspace' : 'Create Patient Account'}
+                {!busy && <ArrowRight size={17} />}
               </button>
             </form>
+
+            <div className="ns-security-note"><ShieldCheck size={16} /> Your account details are protected by role-based access.</div>
 
             {/* Demo credential roster — dev/staging only, never shown in a production build */}
             {mode === 'login' && import.meta.env.DEV && (
