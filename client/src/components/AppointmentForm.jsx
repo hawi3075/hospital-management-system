@@ -106,7 +106,7 @@ const AppointmentForm = () => {
           </select>
         </div>
 
-        {/* Appointment Date */}
+        
         <div>
           <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Appointment Date</label>
           <input type="date" name="date" value={formData.date} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
