@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../utils/apiClient';
 
-const emptyForm = { patientId: '', doctorId: '', departmentId: '', date: '', time: '10:00 AM', reason: '' };
+const emptyForm = { patientId: '', doctorId: '', departmentId: '', date: '', time: '10:00', reason: '' };
 
 const AppointmentForm = ({ onScheduled }) => {
   const [patients, setPatients] = useState([]);
@@ -27,7 +27,7 @@ const AppointmentForm = ({ onScheduled }) => {
         setPatients(patientsRes.data.data || []);
         setDoctors(doctorsRes.data.data || []);
         setDepartments(departmentsRes.data.data || []);
-      } catch (err) {
+      } catch {
         setError('Failed to load dropdown dependencies.');
       } finally {
         setLoading(false);
