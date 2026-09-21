@@ -1,6 +1,27 @@
 const bcrypt = require('bcrypt');
 const prisma = require('../utils/db');
 
+exports.getDepartments = async (req, res, next) => {
+  try {
+    const departments = await prisma.department.findMany({ orderBy: { name: 'asc' } });
+    res.status(200).json({ success: true, count: departments.length, data: departments });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getDoctors = async (req, res, next) => {
+  try {
+    const doctors = await prisma.doctor.findMany({
+      include: { employee: { include: { department: true } } },
+      orderBy: { employee: { firstName: 'asc' } },
+    });
+    res.status(200).json({ success: true, count: doctors.length, data: doctors });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Create a hospital department
 exports.createDepartment = async (req, res, next) => {
   try {

@@ -9,7 +9,19 @@ const appointmentIncludes = {
 };
 
 const parseAppointmentDate = (date, time) => {
-  const parsed = new Date(time ? `${date}T${time}` : date);
+  if (!date) return null;
+  let normalizedTime = time;
+  const twelveHourTime = String(time || '').match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+  if (twelveHourTime) {
+    let hour = Number(twelveHourTime[1]);
+    const minutes = twelveHourTime[2];
+    const meridiem = twelveHourTime[3].toUpperCase();
+    if (hour < 1 || hour > 12) return null;
+    if (meridiem === 'PM' && hour !== 12) hour += 12;
+    if (meridiem === 'AM' && hour === 12) hour = 0;
+    normalizedTime = `${String(hour).padStart(2, '0')}:${minutes}`;
+  }
+  const parsed = new Date(normalizedTime ? `${date}T${normalizedTime}` : date);
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 

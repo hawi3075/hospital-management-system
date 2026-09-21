@@ -1,20 +1,15 @@
 import { useEffect, useState } from 'react';
 import apiClient from '../utils/apiClient';
 
-const AppointmentForm = () => {
+const emptyForm = { patientId: '', doctorId: '', departmentId: '', date: '', time: '10:00 AM', reason: '' };
+
+const AppointmentForm = ({ onScheduled }) => {
   const [patients, setPatients] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const [formData, setFormData] = useState({
-    patientId: '',
-    doctorId: '',
-    departmentId: '',
-    date: '',
-    time: '10:00 AM',
-    reason: ''
-  });
+  const [formData, setFormData] = useState(emptyForm);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
@@ -53,14 +48,8 @@ const AppointmentForm = () => {
     try {
       await apiClient.post('/appointments', formData);
       setMessage('Appointment successfully scheduled!');
-      setFormData({
-        patientId: '',
-        doctorId: '',
-        departmentId: '',
-        date: '',
-        time: '10:00 AM',
-        reason: ''
-      });
+      setFormData(emptyForm);
+      onScheduled?.();
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to schedule appointment.');
     }
@@ -115,7 +104,7 @@ const AppointmentForm = () => {
         {/* Time Slot */}
         <div>
           <label style={{ display: 'block', fontSize: '12px', fontWeight: 'bold' }}>Time Slot</label>
-          <input type="text" name="time" value={formData.time} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
+          <input type="time" name="time" value={formData.time} onChange={handleChange} required style={{ width: '100%', padding: '8px', boxSizing: 'border-box' }} />
         </div>
 
         {/* Reason for Visit */}
