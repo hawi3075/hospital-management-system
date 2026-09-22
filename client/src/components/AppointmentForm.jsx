@@ -20,8 +20,8 @@ const AppointmentForm = ({ onScheduled }) => {
         // Fetch patients, doctors, and departments concurrently
         const [patientsRes, doctorsRes, departmentsRes] = await Promise.all([
           apiClient.get('/patients'),
-          apiClient.get('/staff/doctors'), // Ensure this endpoint matches your backend route
-          apiClient.get('/departments')    // Ensure this endpoint matches your backend route
+          apiClient.get('/staff/doctors'), 
+          apiClient.get('/departments')    
         ]);
 
         setPatients(patientsRes.data.data || []);
