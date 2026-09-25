@@ -17,7 +17,7 @@ const AppointmentForm = ({ onScheduled }) => {
     const fetchDropdownData = async () => {
       try {
         setLoading(true);
-        // Fetch patients, doctors, and departments concurrently
+        
         const [patientsRes, doctorsRes, departmentsRes] = await Promise.all([
           apiClient.get('/patients'),
           apiClient.get('/staff/doctors'), 
